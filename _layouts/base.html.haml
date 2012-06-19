@@ -10,6 +10,7 @@
       }
     %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/styles.css" }
     %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/theme.css" }
+    %link{ :rel=>'alternate',"type" => "application/atom+xml", "title" => "Blog Feed", "href" => "#{site.base_url}/blog/feed.atom"}
     /[if lt IE 9]
       %script{ :type=>'text/javascript', :src=>'//html5shim.googlecode.com/svn/trunk/html5.js' }
     %script{ :type=>'text/javascript', :src=>'//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js' }
@@ -23,6 +24,10 @@
           %ul.nav
             %li
               %a{ :href=>"#{site.base_url}" } Home
+          %ul.nav.pull-right
+            %li
+              %a{:href=>"#{site.base_url}/blog/feed.atom", :style=> "padding-top:5px"}
+                %img{:src=>"#{site.base_url}/images/rss_32.png"}
     .main-container
       .row-fluid
         .span9
