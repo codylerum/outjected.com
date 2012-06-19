@@ -1,0 +1,75 @@
+!!!5
+%html
+  %head
+    %meta{ :charset=>'utf-8' }
+    %title Outjected - An infrequent blog about the frequent issues and annoyances that pop up while coding.
+    %meta{ :name=>'viewport', :content=>'width=device-width, initial-scale=1.0' }
+    :css
+      body {
+        padding-top: 60px;
+      }
+    %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/styles.css" }
+    %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/theme.css" }
+    /[if lt IE 9]
+      %script{ :type=>'text/javascript', :src=>'//html5shim.googlecode.com/svn/trunk/html5.js' }
+    %script{ :type=>'text/javascript', :src=>'//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js' }
+    %script{ :type=>'text/javascript', :src=>"#{site.base_url}/javascripts/bootstrap.min.js" }
+
+  %body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .main-container
+          %a.brand{ :href=>"#{site.base_url}" } Outjected
+          %ul.nav
+            %li
+              %a{ :href=>"#{site.base_url}" } Home
+    .main-container
+      .row-fluid
+        .span9
+          ~ content
+        .span3
+          .label.text-center
+            About outjected.com
+          .well.well-small
+            Outjected is an infrequent blog about the frequent issues and annoyances that pop up while coding.
+        .span3
+          .label.text-center
+            About Me
+          .well.well-small
+            .row-fluid
+              .span4
+                %a{:href=>'http://en.gravatar.com/codylerum'}
+                  %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( 'cody.lerum@gmail.com' )}
+              .span8
+                <strong>Cody Lerum</strong>
+                %br/
+                <div style="padding-top:5px">
+                <a href="https://twitter.com/codylerum" class="twitter-follow-button" data-show-count="false">Follow @codylerum</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                </div>
+        .span3
+          .label.text-center
+            Blog Archive
+          .well.well-small.blog-archive
+            %ul.unstyled#years
+            -site.blog_map.each do |year, months|
+              %li.year{:id=>"year_#{year}"}
+                %a{:data => {:toggle => "collapse", :target => "#year_#{year} > ul.year", :parent=>"#years"}, :href => "##{year}"}
+                  = year
+                %ul.year.collapse
+                  -months.each do |month, posts|
+                    %li.month{:id=>"month_#{month}_#{year}"}
+                      %span.month= Date::MONTHNAMES[month]
+                      %span.count= "(#{posts.size})"
+                      %ul.month
+                        -posts.each do |post|
+                          %li
+                            %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
+
+      %hr
+      %footer
+        %p
+          &copy; Cody Lerum #{Date.today.year} baked with
+          %a{:href => "http://www.awestruct.org", :target=> "_"} Awestruct
+    - if site.google_analytics
+      = google_analytics_async

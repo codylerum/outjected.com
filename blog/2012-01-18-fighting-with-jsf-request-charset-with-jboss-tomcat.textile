@@ -1,0 +1,49 @@
+---
+title: Fighting with JSF Request charset with JBoss or Tomcat
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, jsf, jboss ]
+---
+
+p. After just spending a good amount of time troubleshooting an issue with character encoding in JSF + JBoss AS7 I thought I would throw up a few notes on the subject as there are lots of scattered bits floating around but no real clear explanation. Hopefully this does more than contribute to the scattered bits :-)
+
+p. First lets start off with a little background on how servers and clients determine how to encode data for transfer
+
+* Server response to Client:
+** +*Server Encode*+: When a server is sending a response to a client with JSF it encodes the response based on the defined enconding of the file which is usually set at the top of a JSF XHTML file @<?xml version="1.0" encoding="UTF-8"?>@ The server will also include a Content-Type in the response header sent to the client.
+** +*Client Decode*+: When the client receives a response it checks the Content-Type defined in the response headers to decide which charset to use for decode. _However If the Content-Type is not listed in the response header then the client may check the page meta tags for a hint or default to ISO-8955-1_
+
+* Client Request (POST) to Server:
+** +*Client Encode*+: The client will encode it's request based on the encoding of the response it received from the server.
+** +*Server Decode*+: This is where things get a little tricky.
+*** The request received from the client will likely lack any hint as to how things were encoded.
+**** It may have a Accept-Charset defined, but that is simply informing the server which charset's are valid for it's response encoding.
+**** It will also have a Content-Type which reflects the enctype set on the form element submitting this post. By default it is application/x-www-form-urlencoded. Notice no reference to the charset this request was encoded in.
+**** Some requests like ajax requests will look like this  "application/x-www-form-urlencoded;charset=utf-8;" This does work and Tomcat/JbossWeb will decode as utf-8 but I have not figured out how to force this on a non-ajax h:form
+*** The catch here is that if there is not a charset defined in the request Content-Type then the request parameters will be decoded using ISO-8859-1.
+
+p. So you've configured for pages for UTF-8 and ensured that your server responses are including a charset in the Content-Type. Everything is great until you submit the form and your UTF-8 encoded client request is decoded as ISO-8859-1. Depending on the data your users submit you may not even notice this in your app for weeks/months/years/never. But for example if user may submit something like I’m and you will get Iâ€™m
+
+p. Once you accept that this is how things work, there is an easy way to fix this by adding the following snippet to your web.xml
+
+bc.. <web-app>
+  ...
+
+    <filter>
+      <filter-name>forceUTF8CharSet</filter-name>
+      <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+      <init-param>
+        <param-name>encoding</param-name>
+        <param-value>utf-8</param-value>
+      </init-param>
+    </filter>
+
+    <filter-mapping>
+      <filter-name>forceUTF8CharSet</filter-name>
+      <url-pattern>*</url-pattern>
+    </filter-mapping>
+  ...
+</web-app>
+
+p. This filter currently is in Tomcat 7.0.20 and up. If you are running JBoss 7 you can just grab the class from "Github":https://github.com/apache/tomcat70/blob/b6e55ec63249677f88a0a1d9daa93278741726d6/java/org/apache/catalina/filters/SetCharacterEncodingFilter.java import it into your project. I opened "JBWEB-225":https://issues.jboss.org/browse/JBWEB-225 with JBoss Web to have this filter added.

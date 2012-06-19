@@ -1,0 +1,11 @@
+disqus: outjected
+disqus_generate_id: true
+google_analytics: UA-32753867-1
+profiles:
+  development:
+    base_url: http://stewie:4242
+  production:
+    base_url: http://www.outjected.com
+    deploy:
+      host: awestruct@tin.clearfly.net
+      path: /var/www/outjected.com

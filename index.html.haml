@@ -1,0 +1,17 @@
+---
+layout: base
+---
+.row-fluid
+  .span12
+    - 5.times do |n|
+      - if site.blogs[n] != nil
+        .row-fluid
+          .span12.floating-page.blog-page
+            %h3
+              %a{:href=>site.blogs[n].url}= site.blogs[n].title
+            .blog-content
+              = site.blogs[n].content
+              .pull-right
+                %h6 #{site.blogs[n].author} - #{site.blogs[n].date.strftime( '%B %d, %Y' )}
+              .clearfix
+

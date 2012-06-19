@@ -1,0 +1,183 @@
+---
+title: Composite Primary Key with @ManyToOne
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, hibernate ]
+---
+Here is a fun issue that I ran into the other day while working with a legacy database.
+
+Three tables:
+
+*Nodes*
+* NodeID(pk)
+
+*Interfaces*
+* InterfaceID(pk)
+* NodeID(fk)
+
+*InterfaceTraffic_Detail*
+* InterfaceID(pk)
+* DateTime(pk)
+* NodeID(fk)
+
+The InterfaceTraffic_Detail table turned out to be a little tricky for me since I have never worked with composite indexes in hibernate. It took a little trial and error but here is what I came up with
+
+My environment is  Hibernate 3.4
+
+h5. NmsNode.java
+
+bc.. @Name("nmsNode")
+@Entity
+@Table(name="Nodes")
+public class NmsNode implements Serializable {
+  private static final long serialVersionUID = 1462044144509159489L;
+
+  private int id;
+  private List&lt;NmsInterface&gt; interfaces;
+
+  @Id
+  @Column(name="NodeID")
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  @OneToMany(mappedBy="node", fetch=FetchType.LAZY)
+  public List&lt;NmsInterface&gt; getInterfaces() {
+    return interfaces;
+  }
+
+  public void setInterfaces(List&lt;NmsInterface&gt; interfaces) {
+    this.interfaces = interfaces;
+  }
+}
+
+h5. NmsInterface.java
+
+bc.. @Name("nmsInterface")
+@Entity
+@Table(name="Interfaces")
+public class NmsInterface implements Serializable
+{
+
+   private static final long serialVersionUID = 1L;
+
+   private int id;
+   private NmsNode node;
+
+
+   @Id
+   @Column(name="InterfaceID")
+   public int getId()
+   {
+      return id;
+   }
+   public void setId(int id)
+   {
+      this.id = id;
+   }
+
+   @ManyToOne
+   @JoinColumn(name="NodeID")
+   public NmsNode getNode()
+   {
+      return node;
+   }
+   public void setNode(NmsNode node)
+   {
+      this.node = node;
+   }
+}
+
+h5. InterfaceTraffic_Detail.java
+
+bc.. @Entity
+@Table(name="InterfaceTraffic_Detail")
+@AssociationOverrides
+   (
+      {
+           @AssociationOverride(name = "id.nmsInterface",
+                 joinColumns = @JoinColumn(name = "InterfaceID"))
+      }
+   )
+public class InterfaceTraffic_Detail implements Serializable
+{
+   private static final long serialVersionUID = 1L;
+   private InterfaceTraffic_PrimaryKey id;
+   private NmsNode nmsNode;
+
+   @EmbeddedId
+   @AttributeOverrides
+   (
+         {
+            @AttributeOverride(name="id.dateTime", column=@Column(name="DateTime"))
+         }
+   )
+   public InterfaceTraffic_PrimaryKey getId()
+   {
+      return id;
+   }
+   public void setId(InterfaceTraffic_PrimaryKey id)
+   {
+      this.id = id;
+   }
+   @ManyToOne
+   @JoinColumn(name="NodeID")
+   public NmsNode getNmsNode()
+   {
+      return nmsNode;
+   }
+   public void setNmsNode(NmsNode nmsNode)
+   {
+      this.nmsNode = nmsNode;
+   }
+}
+
+h5. InterfaceTraffic_PrimaryKey.java
+
+bc.. @Embeddable
+public class InterfaceTraffic_PrimaryKey implements Serializable
+{
+   private static final long serialVersionUID = 1L;
+   private NmsInterface nmsInterface;
+   private Date dateTime;
+
+   @ManyToOne
+   public NmsInterface getNmsInterface()
+   {
+      return nmsInterface;
+   }
+   public void setNmsInterface(NmsInterface nmsInterface)
+   {
+      this.nmsInterface = nmsInterface;
+   }
+   public Date getDateTime()
+   {
+      return dateTime;
+   }
+   public void setDateTime(Date dateTime)
+   {
+      this.dateTime = dateTime;
+   }
+
+   public int hashCode() {
+      return (int) dateTime.hashCode() + nmsInterface.getId();
+  }
+
+  public boolean equals(Object obj) {
+      if (obj == this) return true;
+      if (obj == null) return false;
+      if (!(obj instanceof InterfaceTraffic_PrimaryKey)) return false;
+      InterfaceTraffic_PrimaryKey pk = (InterfaceTraffic_PrimaryKey) obj;
+      return pk.nmsInterface.getId() == nmsInterface.getId() &amp;&amp; pk.dateTime.equals(dateTime);
+  }
+}
+
+p. The important part here is the @EmbeddedId and @Embeddable on the InterfaceTraffic_Detail and InterfaceTraffic_PrimaryKey as well as the name "id.nmsInterface" on the @AssociationOverride so that I could reference the variable on the embedded class and define the @JoinColumn
+
+p. Hopefully this saves someone else some time.
+
