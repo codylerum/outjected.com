@@ -1,5 +1,5 @@
 ---
-title: Fighting with JSF Request charset with JBoss or Tomcat
+title: "Fighting with JSF Request charset: JBoss or Tomcat"
 layout: blog
 author: Cody Lerum
 email: cody.lerum@gmail.com
