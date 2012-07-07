@@ -1,0 +1,166 @@
+---
+title: "Sending Queued Mail with Seam Mail"
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, seam, email ]
+---
+h4. The Problem
+
+p. One of the more common questions that I see by users coming to "Seam 3 Mail":http://www.seamframework.org/Seam3/MailModule is about sending email asynchronously like was possible in "Seam 2":http://docs.jboss.org/seam/2.2.2.Final/reference/en-US/html_single/#d0e21609. This usually stems from "slowness" problems that arise when sending mail through an interactive application. The problem is that when your "user" submits that order for his fancy new widgets, the confirmation email sent is using the same thread that handled the processing of the web page. Thus the user is left with their browser in a blocked "loading" state thinking your application is slow when in reality it's the mail server that is taking its sweet time.
+
+h4. The Knee-jerk Reaction
+
+p. A lot of people will see this blocked thread and think the solution is to fire the email asynchronously. This way the email with be dispatched via separate thread and control will be instantly returned to the user . However the problem with asynchronous methods is that they are fire and forget. If an exception occurs during the send process, then the email is lost and there is no notification that it failed. Realistically, outside of a demo application you generally want some guarantee that the email was, or will be sent as having all those order confirmation emails silently lost will not be pretty.
+
+h4. You Really Want
+
+p. What is needed is a system which allows you to send email from your application without blocking the execution on the current thread, while at the same time providing a guarantee that the email will be reliably sent (at least from your application to your "SMTP":http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol server).
+
+h4. The Solution
+
+p. Seam Mail provides a way to replace out the default "send" implementation with one of your own via the "MailTransporter":https://github.com/seam/mail/blob/develop/api/src/main/java/org/jboss/seam/mail/core/MailTransporter.java interface. That way when you call @msg.send()@ you can control how and when the email is "sent". What follows is a basic implementation.
+
+p. _In the code that follows I'm skipping the import statements for the sake of readability, but everything is standard EE6 + Seam 3 with exception of the @Files@ which comes from "Google Guava":http://code.google.com/p/guava-libraries/._
+
+p. The default MailTransporterImpl is very simple and looks as follows.
+
+bc.. public class MailTransporterImpl implements MailTransporter {
+
+    private Session session;
+
+    public MailTransporterImpl(Session session) {
+        this.session = session;
+    }
+
+    public EmailMessage send(EmailMessage emailMessage) {
+        MailUtility.send(emailMessage, session);
+        return emailMessage;
+    }
+}
+
+p. The @MailUtility.send(emailMessage, session)@ sends the email using the configured javax.mail.Session. This is a blocking implementation and will not release the thread until the destination mail server has acknowledged receipt of the message. This might take a couple milliseconds or a few minutes depending on message size, server performance and network bandwidth. If this doesn't work for you then it's easy to swap out.
+
+p. First lets create a new MailTransporter called MailQueueTransporter
+
+bc.. public class MailQueueTransporter implements Serializable, MailTransporter {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    @QueuedEmail
+    private Event<MimeMessage> queueEvent;
+
+    @Inject
+    @ExtensionManaged
+    private Instance<Session> session;
+
+    @Override
+    public EmailMessage send(EmailMessage emailMessage) {
+
+        MimeMessage msg = MailUtility.createMimeMessage(emailMessage, session.get());
+        queueEvent.fire(msg);
+
+        return emailMessage;
+    }
+}
+
+p. Starting from the top we see that we are injecting a new "Event":http://docs.oracle.com/javaee/6/api/javax/enterprise/event/package-summary.html qualified with @@QueuedMail@ and typed to "MimeMessage":http://docs.oracle.com/javaee/6/api/javax/mail/internet/MimeMessage.html. @@QueuedMail@ is a simple qualifier, and if you have never written one before here is what it looks like.
+
+bc.. @Qualifier
+@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface QueuedEmail { }
+
+p. Next we inject the javax.mail.Session as managed by Seam Mail and implement the @public EmailMessage send(EmailMessage emailMessage)@ as mandated by the interface. Inside this method we use the Seam MailUtility class to convert our EmailMessage as built by Seam Mail to a standard MimeMessage and then fire it as as a CDI event.
+
+p. A CDI event however is still blocking in its execution so lets see what is observing this event.
+
+bc.. public class MailQueueReceiver {
+
+    @Inject
+    private Logger log;
+
+    public static final String mailQueueFolder = "/var/data/mailQueue/";
+
+    public void receiveMessage(@Observes @QueuedEmail MimeMessage msg) {
+        log.debugf("Writing queued message to disk");
+        OutputStream os;
+        try {
+            os = Files.newOutputStreamSupplier(
+              new File(mailQueueFolder + UUID.randomUUID())).getOutput();
+            msg.writeTo(os);
+            os.close();
+        } catch (IOException e) {
+            throw new SendFailedException("Failed to Write Message to Queue", e);
+        } catch (MessagingException e) {
+            throw new SendFailedException(e);
+        }
+    }
+}
+
+p. What we have done here is to receive the CDI event and immediately write the message to persistent storage, in this case to a queue folder on the application server. Now our thread is returned as fast as we can write the message to disk. You could also write these bytes out to the database or a in memory store if the loss of queued email during a server shutdown/crash is not an issue.
+
+p. All that is needed now is a process to send these stored messages. I'm using a EJB 3.1 scheduled timer, but the options are endless.
+
+bc.. @Singleton
+public class MailQueueSender {
+
+    @Inject
+    private Logger log;
+
+    @Inject
+    @ExtensionManaged
+    private Session session;
+
+    private String mailQueueFolder;
+
+    @PostConstruct
+    public void postConstruct() {
+        mailQueueFolder = MailQueueReceiver.mailQueueFolder;
+        File queueFolder = new File(mailQueueFolder);
+        session.getProperties().put("mail.smtp.connectiontimeout", 15000);
+        session.getProperties().put("mail.smtp.timeout", 15000);
+        log.infof("Initialized Mail Queue with %s messages in queue", queueFolder.listFiles().length);
+    }
+
+    @Schedule(second = "15,45", minute = "*", hour = "*", persistent = false)
+    public void sendQueue() throws InterruptedException {
+
+        File queueFolder = new File(mailQueueFolder);
+        LinkedList<File> files = new LinkedList<File>(Arrays.asList(queueFolder.listFiles()));
+
+        while (!files.isEmpty()) {
+            File file = files.peek();
+            InputStream is;
+            try {
+                is = Files.newInputStreamSupplier(file).getInput();
+                RootMimeMessage msg = new RootMimeMessage(session, is);
+                msg.setMessageId(generateMessageId());
+                Transport.send(msg);
+                log.debug("Sent Mail Message: " + msg.getMessageID());
+                is.close();
+                files.pop();
+                file.delete();
+            }
+            catch (IOException e) {
+                throw new SendFailedException("Failed to read message from Disk: " + file.getName(), e);
+            }
+            catch (MessagingException e) {
+                throw new SendFailedException("Send Failed for Message: " + file.getName(), e);
+            }
+        }
+    }
+
+    private String generateMessageId() {
+        String mailerDomainName = session.getProperty("mail.seam.domainName");
+        if (mailerDomainName != null && mailerDomainName.length() > 0) {
+            return UUID.randomUUID().toString() + "@" + mailerDomainName;
+        }
+        else {
+            return UUID.randomUUID().toString() + "@" + MailUtility.getHostName();
+        }
+    }
+}
+
+p. One thing to note is that you have to reset the @javax.mail.Session@ as that is lost when the MimeMessage is converted to a OutputStream. There is a little added complexity going on here as I like to control the domain part of a Message-ID, but this is a simple reliable way to handle sending mail in a fast and reliable fashion.
