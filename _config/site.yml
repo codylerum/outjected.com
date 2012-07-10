@@ -5,6 +5,7 @@ profiles:
     disqus: outjected
     disqus_generate_id: true
     google_analytics: UA-32753867-2
+    change_frequency: weekly
     base_url: http://www.outjected.com
     deploy:
       host: awestruct@tin.clearfly.net
