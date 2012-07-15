@@ -1,0 +1,20 @@
+---
+title: "Seam Mail 3.1.1.Final Released"
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, seam, email ]
+---
+h5. Obligatory Links and Compatibility
+
+p. I'm happy to announce that I've released a minor update to "Seam 3 Mail":http://www.seamframework.org/Seam3/Mail versioned "3.1.1.Final":https://repository.jboss.org/nexus/index.html#nexus-search;quick~seam-mail. This is a minor release which is compatible with "Seam 3.1.0.Final":http://in.relation.to/Bloggers/JBossSeam31FinalReleased.
+
+h5. Whats new?
+
+p. The main goal of this release was to fill in some gaps in documentation as well as some minor bug fixes which popped up since the 3.1.0.Final release. I've also added in a utility class called "MessageConverter":https://github.com/seam/mail/blob/develop/impl/src/main/java/org/jboss/seam/mail/util/MessageConverter.java which allows you to read a MimeMessage back into the internal EmailMessage object used by Seam Mail. This opens up the option for Seam Mail to receive messages in addition to sending them. Check out "Closed Issues":https://issues.jboss.org/browse/SEAMMAIL/fixforversion/12318997#selectedTab=com.atlassian.jira.plugin.system.project%3Aversion-issues-panel on the JIRA tracker for details.
+
+h5. What the future look like?
+
+p. Seam 3 Mail will continue to provide releases in its current format until the times comes for it to transition to "Apache DeltaSpike":http://incubator.apache.org/deltaspike/. In the meantime if you have features for fixs to contribue just open a "JIRA":http://jira.jboss.org/browse/SEAMMAIL and I'll be happy to work them in.
+
+Thanks!
