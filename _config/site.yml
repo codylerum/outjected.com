@@ -1,10 +1,12 @@
 profiles:
   development:
+    robots: ['/']
     base_url: http://stewie:4242
   production:
     disqus: outjected
     disqus_generate_id: true
     google_analytics: UA-32753867-2
+    robots: ['google5576bee535bb3234.html']
     change_frequency: weekly
     base_url: http://www.outjected.com
     deploy:
