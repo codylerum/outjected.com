@@ -1,7 +1,10 @@
 Development
+
+bundle update
+
 --------------------
-awestruct -d --force
+bundle exec awestruct -d --force
 
 Deploying to Production
 -----------------------
-awestruct -P production --deploy --force --generate
+bundle exec awestruct -P production --deploy --force --generate
