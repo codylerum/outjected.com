@@ -21,16 +21,13 @@
   %body
     .navbar.navbar-fixed-top
       .navbar-inner
-        .main-container
+        .container
           %a.brand{ :href=>"#{site.base_url}" } Outjected
-          %ul.nav
-            %li
-              %a{ :href=>"#{site.base_url}" } Home
           %ul.nav.pull-right
             %li
               %a{:href=>"#{site.base_url}/blog/feed.atom", :style=> "padding-top:5px"}
                 %img{:src=>"#{site.base_url}/images/rss_32.png"}
-    .main-container
+    .container
       .row-fluid
         .span9
           ~ content
