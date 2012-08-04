@@ -1,6 +1,7 @@
 GIT
-  remote: git://github.com/awestruct/awestruct.git
-  revision: 138a1aaa2d265814d45df29ca8ee2791db988a7a
+  remote: git://github.com/codylerum/awestruct.git
+  revision: a9eb6c418a49eaa53ce4606a78f68d6f1bb75f6e
+  branch: clearfly
   specs:
     awestruct (0.4.6)
       RedCloth (~> 4.2.9)
@@ -41,7 +42,7 @@ GEM
     eventmachine (1.0.0.rc.4-x86-mingw32)
     execjs (1.4.0)
       multi_json (~> 1.0)
-    ffi (1.1.0-x86-mingw32)
+    ffi (1.1.4-x86-mingw32)
     fssm (0.2.9)
     git (1.2.5)
     haml (3.1.6)
