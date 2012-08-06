@@ -70,6 +70,13 @@
                           -posts.each do |post|
                             %li
                               %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
+          .span12
+            .label.text-center
+              Tags
+            .well.well-small
+              .row-fluid
+                .tags
+                  = site.blogs_tag_cloud
 
       %hr
       %footer

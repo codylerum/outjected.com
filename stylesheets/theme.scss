@@ -1,0 +1,54 @@
+.floating-page {
+    border: 1px solid #C2BFBD;
+    box-shadow: 0px 2px 5px #666;
+    border-radius: 5px;
+}
+
+.text-center {
+    text-align:center;
+}
+
+.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.blog-content {
+    margin: 5px;
+    padding:10px;
+    margin-left:15px;
+}
+
+.blog-page {
+    margin-bottom:30px;
+    padding-left:15px;
+}
+
+.tag_link {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+@mixin tag-cloud-groups($groups, $increment: .1) {
+  @for $n from 0 through ($groups - 1) {
+    $opacity: $n * .05 + .8;
+    @if $opacity > 1 {
+      $opacity: 1;
+    }
+    .tag-#{$n} {
+      font-size: #{1 + $n * $increment}em;
+      opacity: $opacity;
+    }
+  }
+}
+
+.tag-cloud {
+  @include tag-cloud-groups(12, .15);
+  a {
+    padding: 3px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  text-align : center;
+}
