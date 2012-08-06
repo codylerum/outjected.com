@@ -3,7 +3,7 @@ layout: base
 ---
 .row-fluid
   .span1
-    %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( page.email )}
+    %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( page.email ), :alt=>"Profile Image"}
   .span11
     %h3
       #{page.title}

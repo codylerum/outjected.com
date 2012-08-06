@@ -26,7 +26,7 @@
           %ul.nav.pull-right
             %li
               %a{:href=>"#{site.base_url}/blog/feed.atom", :style=> "padding-top:5px"}
-                %img{:src=>"#{site.base_url}/images/rss_32.png"}
+                %img{:src=>"#{site.base_url}/images/rss_32.png", :alt=>"RSS Logo"}
     .container
       .row-fluid
         .span9
@@ -44,7 +44,7 @@
               .row-fluid
                 .span4
                   %a{:href=>'http://en.gravatar.com/codylerum'}
-                    %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( 'cody.lerum@gmail.com' )}
+                    %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( 'cody.lerum@gmail.com' ), :alt=>"Profile Image"}
                 .span8
                   <strong>Cody Lerum</strong>
                   %br/
@@ -56,20 +56,20 @@
             .label.text-center
               Blog Archive
             .well.well-small.blog-archive
-              %ul.unstyled#years
-              -site.blog_map.each do |year, months|
-                %li.year{:id=>"year_#{year}"}
-                  %a{:data => {:toggle => "collapse", :target => "#year_#{year} > ul.year", :parent=>"#years"}, :href => "##{year}"}
-                    = year
-                  %ul.year.collapse
-                    -months.each do |month, posts|
-                      %li.month{:id=>"month_#{month}_#{year}"}
-                        %span.month= Date::MONTHNAMES[month]
-                        %span.count= "(#{posts.size})"
-                        %ul.month
-                          -posts.each do |post|
-                            %li
-                              %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
+              %ul#years
+                -site.blog_map.each do |year, months|
+                  %li.year{:id=>"year_#{year}"}
+                    %a{:data => {:toggle => "collapse", :target => "#year_#{year} > ul.year", :parent=>"#years"}, :href => "##{year}"}
+                      = year
+                    %ul.year.collapse
+                      -months.each do |month, posts|
+                        %li.month{:id=>"month_#{month}_#{year}"}
+                          %span.month= Date::MONTHNAMES[month]
+                          %span.count= "(#{posts.size})"
+                          %ul.month
+                            -posts.each do |post|
+                              %li
+                                %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
           .span12
             .label.text-center
               Tags
@@ -82,6 +82,6 @@
       %footer
         %p
           &copy; Cody Lerum #{Date.today.year} baked with
-          %a{:href => "http://www.awestruct.org", :target=> "_"} Awestruct
+          %a{:href => "http://www.awestruct.org", :target=> "new"} Awestruct
     - if site.google_analytics
       = google_analytics_async
