@@ -18,7 +18,7 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
                     %span.title
                       tags:
                     -for tag in blog.tags
-                      %a.label.label-info.text-center.tag_link{:href => "/blog/tags/#{tag}"} #{tag}
+                      %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
               .pull-right
                 %h6 #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
               .clearfix
