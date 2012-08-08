@@ -1,7 +1,7 @@
 GIT
-  remote: git://github.com/codylerum/awestruct.git
-  revision: a9eb6c418a49eaa53ce4606a78f68d6f1bb75f6e
-  branch: clearfly
+  remote: git://github.com/awestruct/awestruct.git
+  revision: 86991d35bc46b388a26f6a974f5488edc540aabc
+  branch: master
   specs:
     awestruct (0.4.6)
       RedCloth (~> 4.2.9)
@@ -27,7 +27,7 @@ GEM
   specs:
     RedCloth (4.2.9-x86-mingw32)
     bootstrap-sass (2.0.4.0)
-    chunky_png (1.2.5)
+    chunky_png (1.2.6)
     coffee-script (2.2.0)
       coffee-script-source
       execjs
