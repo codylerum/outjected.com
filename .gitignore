@@ -5,3 +5,4 @@ _tmp
 .awestruct
 .idea
 _web
+Gemfile.lock
