@@ -2,7 +2,10 @@
 %html
   %head
     %meta{ :charset=>'utf-8' }
-    %title Outjected - An infrequent blog about the frequent issues and annoyances that pop up while coding.
+    -if page.title
+      %title #{page.title}
+    -else
+      %title Outjected
     -if page.description != nil
       %meta{:name=>"description", :content=> page.description}
     %meta{ :name=>'viewport', :content=>'width=device-width, initial-scale=1.0' }
