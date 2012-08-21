@@ -13,7 +13,8 @@
       body {
         padding-top: 60px;
       }
-    %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/styles.css" }
+    %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/bootstrap.min.css" }
+    %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/bootstrap-responsive.min.css" }
     %link{ :rel=>'stylesheet', :type=>'text/css', :href=>"#{site.base_url}/stylesheets/theme.css" }
     %link{ :rel=>'alternate',"type" => "application/atom+xml", "title" => "Blog Feed", "href" => "#{site.base_url}/blog/feed.atom"}
     /[if lt IE 9]
@@ -35,54 +36,58 @@
         .span9
           ~ content
         .span3
-          .span12
-            .label.text-center
-              About outjected.com
-            .well.well-small
-              Outjected is an infrequent blog about the frequent issues and annoyances that pop up while coding.
-          .span12
-            .label.text-center
-              About Me
-            .well.well-small
-              .row-fluid
-                .span4
-                  %a{:href=>'http://en.gravatar.com/codylerum'}
-                    %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( 'cody.lerum@gmail.com' ), :alt=>"Profile Image"}
-                .span8
-                  <strong>Cody Lerum</strong>
-                  %br/
-                  <div style="padding-top:5px">
-                  <a href="https://twitter.com/codylerum" class="twitter-follow-button" data-show-count="false">Follow @codylerum</a>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  </div>
-                  <div style="padding-top:5px">
-                  <a href="http://www.linkedin.com/in/codylerum"><img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" alt="View Cody Lerum's profile on LinkedIn"></a>
-                  </div>
-          .span12
-            .label.text-center
-              Blog Archive
-            .well.well-small.blog-archive
-              %ul#years
-                -site.blog_map.each do |year, months|
-                  %li.year{:id=>"year_#{year}"}
-                    %a{:data => {:toggle => "collapse", :target => "#year_#{year} > ul.year", :parent=>"#years"}, :href => "##{year}"}
-                      = year
-                    %ul.year.collapse
-                      -months.each do |month, posts|
-                        %li.month{:id=>"month_#{month}_#{year}"}
-                          %span.month= Date::MONTHNAMES[month]
-                          %span.count= "(#{posts.size})"
-                          %ul.month
-                            -posts.each do |post|
-                              %li
-                                %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
-          .span12
-            .label.text-center
-              Tags
-            .well.well-small
-              .row-fluid
-                .tags
-                  = site.blogs_tag_cloud
+          .row-fluid
+            .span12
+              .label.text-center
+                About outjected.com
+              .well.well-small
+                Outjected is an infrequent blog about the frequent issues and annoyances that pop up while coding.
+          .row-fluid
+            .span12
+              .label.text-center
+                About Me
+              .well.well-small
+                .row-fluid
+                  .span4
+                    %a{:href=>'http://en.gravatar.com/codylerum'}
+                      %img.floating-page{:src=> 'http://www.gravatar.com/avatar/' + Digest::MD5.hexdigest( 'cody.lerum@gmail.com' ), :alt=>"Profile Image"}
+                  .span8
+                    <strong>Cody Lerum</strong>
+                    %br/
+                    <div style="padding-top:5px">
+                    <a href="https://twitter.com/codylerum" class="twitter-follow-button" data-show-count="false">Follow @codylerum</a>
+                    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                    </div>
+                    <div style="padding-top:5px">
+                    <a href="http://www.linkedin.com/in/codylerum"><img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" alt="View Cody Lerum's profile on LinkedIn"></a>
+                    </div>
+          .row-fluid
+            .span12
+              .label.text-center
+                Blog Archive
+              .well.well-small.blog-archive
+                %ul#years
+                  -site.blog_map.each do |year, months|
+                    %li.year{:id=>"year_#{year}"}
+                      %a{:data => {:toggle => "collapse", :target => "#year_#{year} > ul.year", :parent=>"#years"}, :href => "##{year}"}
+                        = year
+                      %ul.year.collapse
+                        -months.each do |month, posts|
+                          %li.month{:id=>"month_#{month}_#{year}"}
+                            %span.month= Date::MONTHNAMES[month]
+                            %span.count= "(#{posts.size})"
+                            %ul.month
+                              -posts.each do |post|
+                                %li
+                                  %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
+          .row-fluid
+            .span12
+              .label.text-center
+                Tags
+              .well.well-small
+                .row-fluid
+                  .tags
+                    = site.blogs_tag_cloud
 
       %hr
       %footer
