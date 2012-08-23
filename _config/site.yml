@@ -12,3 +12,4 @@ profiles:
     deploy:
       host: awestruct@tin.clearfly.net
       path: /var/www/outjected.com
+      uncommited: true
