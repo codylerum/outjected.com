@@ -10,14 +10,15 @@ layout: base
     .floating-page.blog-content
       ~ content
       .clearfix
-      - if page.tags
-        .tags
-          %span.title
-            tags:
-          -for tag in page.tags
-            %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
-      .pull-right
-        %h6 #{page.author} - #{page.date.strftime( '%B %d, %Y' )}
+        .pull-left
+          - if page.tags
+            .tags
+              %span.title
+                tags:
+              -for tag in page.tags
+                %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
+        .pull-right
+          %h6 #{page.author} - #{page.date.strftime( '%B %d, %Y' )}
       .clearfix
-      .comments
-        = page.disqus_comments
+        .comments
+          = page.disqus_comments

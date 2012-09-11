@@ -13,17 +13,19 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
             .blog-content
               = blog.content
               .clearfix
-                - if blog.tags
-                  .tags
-                    %span.title
-                      tags:
-                    -for tag in blog.tags
-                      %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
-              .pull-right
-                %h6 #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
+                .pull-left
+                  - if blog.tags
+                    .tags
+                      %span.title
+                        tags:
+                      -for tag in blog.tags
+                        %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
+                .pull-right
+                  %h6 #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
               .clearfix
-              = blog.disqus_comments_count
-              = blog.disqus_comments_link
+                .pull-left
+                  = blog.disqus_comments_count
+                  = blog.disqus_comments_link
 .row-fluid.text-center
   .span12
     - for p in page.blogs.pages
