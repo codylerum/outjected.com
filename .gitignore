@@ -4,5 +4,5 @@ _tmp
 .sass-cache
 .awestruct
 .idea
-_web
+*.iml
 Gemfile.lock
