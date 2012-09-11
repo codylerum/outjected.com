@@ -64,7 +64,7 @@ p. What we would expect to happen is the selectOneMenu would initially be select
 
 h5. Why it goes wrong.
 
-p. The CDI EG has determined that there is not meaningful way to implement <code>.equals()</code> and <code>.hashCode()</code> on a proxy that can delegate to the underlying bean (See "OWB-458":https://issues.apache.org/jira/browse/OWB-458 & "WELD-695":https://issues.jboss.org/browse/WELD-695). What this means is that two proxies of the same underlying bean with be equal. However, two proxies to underlying beans which are equal according to <code>.equals</code> will not be equal.
+p. The CDI EG has determined that there is not meaningful way to implement <code>.equals()</code> and <code>.hashCode()</code> on a proxy that can delegate to the underlying bean (See "OWB-458":https://issues.apache.org/jira/browse/OWB-458 & "WELD-695":https://issues.jboss.org/browse/WELD-695). What this means is that two proxies of the same underlying bean will be equal. However, two proxies to underlying beans which are equal according to <code>.equals</code> will not be equal.
 
 h5. How can we fix this?
 
