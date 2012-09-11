@@ -1,5 +1,5 @@
 ---
-title: "CDI Proxies and JSF aren't Best Friends Yet"
+title: "CDI and JSF aren't Best Friends Yet"
 layout: blog
 author: Cody Lerum
 email: cody.lerum@gmail.com
