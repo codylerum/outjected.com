@@ -86,8 +86,8 @@
                             %span.count= "(#{posts.size})"
                             %ul.month
                               -posts.each do |post|
-                                %li
-                                  %a{:href => site.base_url + post.url, :title=> post.title}= trim(post.title,40)
+                                %li.ellipsis-overflow
+                                  %a{:href => site.base_url + post.url, :title=> post.title}= post.title
           .row-fluid
             .span12
               .label.text-center
