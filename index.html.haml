@@ -24,7 +24,6 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
                   %h6 #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
               .clearfix
                 .pull-left
-                  = blog.disqus_comments_count
                   = blog.disqus_comments_link
 .row-fluid.text-center
   .span12
@@ -33,3 +32,4 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
         %span.badge #{page.blogs.current_page_index + 1}
       -else
         %a.badge.badge-info{:href=>p.output_path} #{page.blogs.pages.index(p) + 1}
+= page.blogs[0].disqus_comments_count
