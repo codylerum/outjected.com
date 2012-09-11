@@ -71,7 +71,7 @@
                     </div>
           .row-fluid
             .span12
-              .label.text-center
+              %div.label.text-center
                 Blog Archive
               .well.well-small.blog-archive
                 %ul#years
@@ -82,8 +82,9 @@
                       %ul.year.collapse
                         -months.each do |month, posts|
                           %li.month{:id=>"month_#{month}_#{year}"}
-                            %span.month= Date::MONTHNAMES[month]
-                            %span.count= "(#{posts.size})"
+                            %strong
+                              %span.month= Date::MONTHNAMES[month]
+                              %span.count= "(#{posts.size})"
                             %ul.month
                               -posts.each do |post|
                                 %li.ellipsis-overflow

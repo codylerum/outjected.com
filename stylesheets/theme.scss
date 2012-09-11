@@ -32,6 +32,10 @@
     padding-left:15px;
 }
 
+.blog-archive ul,ol {
+  margin-left:15px;
+}
+
 @mixin tag-cloud-groups($groups, $increment: .1) {
   @for $n from 0 through ($groups - 1) {
     $opacity: $n * .05 + .8;
