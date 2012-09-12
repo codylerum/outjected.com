@@ -68,7 +68,7 @@ p. The CDI EG has determined that there is not meaningful way to implement <code
 
 h5. How can we fix this?
 
-p. One solution would be to execute the <code>.equals()</code> on the converted value if a converter exists. However, the JSF RI "Mojarra":http://javaserverfaces.java.net insists ("JAVASERVERFACES-2393":http://java.net/jira/browse/JAVASERVERFACES-2393) that any proxy must delegate equals, hashCode and toString to the proxied instance per "java.lang.reflect.Proxy":http://docs.oracle.com/javase/6/docs/api/java/lang/reflect/Proxy.html. While correct, I feel that if CDI cannot comply with the standard java.lang.reflect.Proxy contract then the JSF and CDI expert groups need to step in and find a solution so that developers can enjoy consistent and predictable behavior in their applications.
+p. One solution would be to execute the <code>.equals()</code> on the converted value if a converter exists. However, the JSF RI "Mojarra":http://javaserverfaces.java.net feels ("JAVASERVERFACES-2393":http://java.net/jira/browse/JAVASERVERFACES-2393) that any proxy must should delegate equals, hashCode and toString to the proxied instance per "java.lang.reflect.Proxy":http://docs.oracle.com/javase/6/docs/api/java/lang/reflect/Proxy.html. In the case of CDI the underlying bean can change during the lifecycle of the proxy and thus delegating isn't realistic. This appears to be one of those places where the JSF and CDI expert groups need to step in and find a solution so that developers can enjoy consistent and predictable behavior in their applications.
 
 
 
