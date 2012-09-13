@@ -32,8 +32,13 @@
     padding-left:15px;
 }
 
-.blog-archive ul,ol {
-  margin-left:15px;
+.blog-archive > ul {
+  margin-left:0px !important;
+}
+
+.blog-archive ul {
+  list-style:none;
+  margin-left:10px;
 }
 
 @mixin tag-cloud-groups($groups, $increment: .1) {
