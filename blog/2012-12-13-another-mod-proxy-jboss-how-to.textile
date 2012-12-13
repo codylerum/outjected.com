@@ -7,11 +7,11 @@ tags: [ jboss, apache, ssl, linux, ubuntu ]
 ---
 h5. Why would you want to do this?
 
-p. After years of having my users connect natively to JBoss application servers in production I have had a few little issues that nagged at me. One of the biggest is that there is not a way to show a custom error page to my users when the JBoss server is down. Second is that I try and limit as much as I can specific configuration details that go into the server configuration so that upgrading between minor releases does not require a lot of configuration editing. Setting up SSL certificates and modifying the default server ports qualifies as hacking up the standard configuration in my book so it is something I would like to avoid.
+p. After years of having my users connect natively to JBoss application servers in production I have had a few little issues that nagged at me. One of the biggest is that there is not a way to show a custom error page to my users when the JBoss server is down. Second is that I try and limit as much as I can specific configuration details that go into the server configuration so that upgrading between minor releases does not require a lot of configuration editing. Setting up SSL certificates and modifying the default server ports qualifies as hacking up the standard configuration in my book so that is something I would like to limit/avoid.
 
 h5. The Goal
 
-p. What we are ultimately trying to do is to have an Apache web server handle all the communication between the user and our system. This communication will be secured via SSL. The apache server however has no real content so it will "proxy" the requests to our JBoss Application server.
+p. What we are ultimately trying to do is have an Apache web server handle all the communication between the user and our system. This communication will be secured via SSL. The apache server however has no real content so it will "proxy" the requests to our JBoss application server. The application server will be as simple as possible and will not run SSL.
 
 h5. Other details
 * Our project is named foo
