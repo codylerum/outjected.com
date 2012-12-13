@@ -91,7 +91,7 @@ bc.. <subsystem xmlns="urn:jboss:domain:web:1.2" default-virtual-server="default
      </virtual-server>
  </subsystem>
 
-p. Your ear/war is going to need a jboss-web.xml (@foo.war/WEB-INF/jboss-web.xml@) which will define the virtual host and set the context root
+p. Your EAR/WAR is going to need a jboss-web.xml (@foo.war/WEB-INF/jboss-web.xml@) which will define the virtual host and set the context root
 
 bc.. <?xml version="1.0"?>
 <!DOCTYPE jboss-web PUBLIC "-//JBoss//DTD Web Application 5.0//EN" "http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd">
@@ -100,4 +100,4 @@ bc.. <?xml version="1.0"?>
     <virtual-host>foo</virtual-host>
 </jboss-web>
 
-p. That is our last step, so go ahead and start your JBoss server and enjoy your new setup Apache + AS7 setup.
+p. Start up your JBoss server as normal and enjoy your new proxied setup.
