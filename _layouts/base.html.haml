@@ -37,19 +37,20 @@
           ~ content
         .span3
           .row-fluid
-            .span12
+            .span12.panel
               .label.text-center
                 About outjected.com
               .well.well-small
                 %p Outjected is an infrequent blog about the frequent issues and annoyances that pop up while coding.
           .row-fluid
-            .alert.alert-error.text-center
-              %strong
-                These are living posts and will be
-                %a{:href=>"https://github.com/codylerum/outjected.com/tree/master/blog", :target=>"_blank"} updated
-                as errors or improvements are found.
+            .span12.panel
+              .well.well-small
+                %strong
+                  These are living posts and will be
+                  %a{:href=>"https://github.com/codylerum/outjected.com/tree/master/blog", :target=>"_blank"} updated
+                  as errors or improvements are found.
           .row-fluid
-            .span12
+            .span12.panel
               .label.text-center
                 About Me
               .well.well-small
@@ -70,7 +71,7 @@
                     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
                     </div>
           .row-fluid
-            .span12
+            .span12.panel
               %div.label.text-center
                 Blog Archive
               .well.well-small.blog-archive
@@ -90,7 +91,7 @@
                                 %li.ellipsis-overflow
                                   %a{:href => site.base_url + post.url, :title=> post.title}= post.title
           .row-fluid
-            .span12
+            .span12.panel
               .label.text-center
                 Tags
               .well.well-small
