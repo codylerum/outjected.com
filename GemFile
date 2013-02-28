@@ -1,3 +1,6 @@
 source :rubygems
 
-gem "awestruct", "0.4.7 "
+gem "awestruct", '0.5.0'
+gem "RedCloth"
+gem "haml"
+gem "sass"
