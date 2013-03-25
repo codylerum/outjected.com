@@ -1,0 +1,19 @@
+---
+title: JSF 2.0 still lacking support for collections
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, jsf ]
+---
+Unfortunately the freshly minted http://java.sun.com/javaee/javaserverfaces/[JSF 2.0] spec still doesn't support a
+generic http://java.sun.com/javase/6/docs/technotes/guides/collections/index.html[Collection] interface. Currently only
+a http://java.sun.com/javase/6/docs/api/java/util/List.html[List] is supported and while this does work for many
+situations, it does cause many issues when you are working with a full http://java.sun.com/javaee/[JavaEE] stack
+since it may be necessary to use http://java.sun.com/javase/6/docs/api/java/util/Set.html[Set] or
+http://java.sun.com/javase/6/docs/api/java/util/SortedSet.html[SortedSet] when working with
+http://java.sun.com/javaee/technologies/persistence.jsp[JPA].
+
+It hasn't been used in the past, but it's time for the users to start voting on java.net. So go there, register and
+throw some of your votes towards this painful issue.
+
+http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-479[Issue 479 - UIData should support the collection interface rather than the List interface]

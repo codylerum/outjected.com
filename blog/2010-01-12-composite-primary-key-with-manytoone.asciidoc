@@ -10,24 +10,30 @@ Here is a fun issue that I ran into the other day while working with a legacy da
 Three tables:
 
 *Nodes*
+
 * NodeID(pk)
 
 *Interfaces*
+
 * InterfaceID(pk)
 * NodeID(fk)
 
 *InterfaceTraffic_Detail*
+
 * InterfaceID(pk)
 * DateTime(pk)
 * NodeID(fk)
 
-The InterfaceTraffic_Detail table turned out to be a little tricky for me since I have never worked with composite indexes in hibernate. It took a little trial and error but here is what I came up with
+The InterfaceTraffic_Detail table turned out to be a little tricky for me since I have never worked with composite
+indexes in hibernate. It took a little trial and error but here is what I came up with
 
 My environment is  Hibernate 3.4
 
-h5. NmsNode.java
+*NmsNode.java*
 
-bc.. @Name("nmsNode")
+[source,java]
+----
+@Name("nmsNode")
 @Entity
 @Table(name="Nodes")
 public class NmsNode implements Serializable {
@@ -55,10 +61,13 @@ public class NmsNode implements Serializable {
     this.interfaces = interfaces;
   }
 }
+----
 
-h5. NmsInterface.java
+*NmsInterface.java*
 
-bc.. @Name("nmsInterface")
+[source,java]
+----
+@Name("nmsInterface")
 @Entity
 @Table(name="Interfaces")
 public class NmsInterface implements Serializable
@@ -92,10 +101,13 @@ public class NmsInterface implements Serializable
       this.node = node;
    }
 }
+----
 
-h5. InterfaceTraffic_Detail.java
+*InterfaceTraffic_Detail.java*
 
-bc.. @Entity
+[source,java]
+----
+@Entity
 @Table(name="InterfaceTraffic_Detail")
 @AssociationOverrides
    (
@@ -136,10 +148,13 @@ public class InterfaceTraffic_Detail implements Serializable
       this.nmsNode = nmsNode;
    }
 }
+----
 
-h5. InterfaceTraffic_PrimaryKey.java
+*InterfaceTraffic_PrimaryKey.java*
 
-bc.. @Embeddable
+[source,java]
+----
+@Embeddable
 public class InterfaceTraffic_PrimaryKey implements Serializable
 {
    private static final long serialVersionUID = 1L;
@@ -176,8 +191,11 @@ public class InterfaceTraffic_PrimaryKey implements Serializable
       return pk.nmsInterface.getId() == nmsInterface.getId() &amp;&amp; pk.dateTime.equals(dateTime);
   }
 }
+----
 
-p. The important part here is the @EmbeddedId and @Embeddable on the InterfaceTraffic_Detail and InterfaceTraffic_PrimaryKey as well as the name "id.nmsInterface" on the @AssociationOverride so that I could reference the variable on the embedded class and define the @JoinColumn
+The important part here is the +@EmbeddedId+ and +@Embeddable+ on the InterfaceTraffic_Detail and
+InterfaceTraffic_PrimaryKey as well as the name "id.nmsInterface" on the +@AssociationOverride+ so that I could
+reference the variable on the embedded class and define the @JoinColumn
 
-p. Hopefully this saves someone else some time.
+Hopefully this saves someone else some time.
 

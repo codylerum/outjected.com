@@ -1,0 +1,127 @@
+---
+title: "JBoss AS7 with Apache + SSL"
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ jboss, apache, ssl, linux, ubuntu ]
+---
+*Why would you want to do this?*
+
+After years of having my users connect natively to JBoss application servers in production I have had a few little
+issues that nagged at me. One of the biggest is that there is not a way to show a custom error page to my users when
+the JBoss server is down. Second is that I try and limit as much as I can specific configuration details that go into
+the server configuration so that upgrading between minor releases does not require a lot of configuration editing.
+Setting up SSL certificates and modifying the default server ports qualifies as hacking up the standard configuration
+in my book so that is something I would like to limit/avoid.
+
+*The Goal*
+
+What we are ultimately trying to do is have an Apache web server handle all the communication between the user and our
+system. This communication will be secured via SSL. The apache server however has no real content so it will "proxy"
+the requests to our JBoss application server. The application server will be as simple as possible and will not run SSL.
+
+*Other details*
+
+* Our project is named foo
+* Requests come to +https://foo.outjected.com+ and we don't want to have our users go to +https://foo.outjected.com/foo/+
+so our web-app context root is going to be "/"
+* We will redirect you to +https://foo.outjected.com+ if you happen to browse to the non-secure +http://foo.outjected.com+
+* We are going to configure the JBoss server with a virtual host so it can support more than one app if needed.
+* We want to serve our own error page if the JBoss server cannot process our request due to being down.
+
+image::/blog/2012/12/13/apache_to_jboss_as.svg[]
+
+This little example is going to be using Ubuntu 12.04.1 LTS and JBoss AS 7.1.3.Final but should be compatible with similar setups.
+
+*Let's do it.*
+
+I'm going to assume you have a bare bones Apache 2+ server and JBoss AS7 server setup. If you don't then search around
+for some guides. This blog is interested in how to pair them, not the basic setup of each. You should also have a
+working application and some basic knowledge of how to deploy on AS7. This isn't meant to be a soup to nuts guide
+for building and deploying your application.
+
+*Apache Prep*
+
+First create a new directory for our non-proxy (error pages) content +/var/www/foo.outjected.com+
+
+Go ahead and create a simple error page at +/var/www/foo.outjected.com/errors/503.html+. This is the page that will be
+served if the app server is down.
+
+Run the following commands to enable the needed modules in apache
+
++a2enmod proxy+ +
++a2enmod proxy_ajp+ +
++a2enmod ssl+ +
+
+Next go into +/etc/apache2/sites-available+ and create a new file foo.outjected.com+. For this example I'm using a
+single server so the server I'm proxying to is +localhost+  Your config may/will/should vary.
+
+----
+
+<VirtualHost *:80>
+    ServerName foo.outjected.com
+    Redirect / https://foo.outjected.com
+</VirtualHost>
+
+<VirtualHost *:443>
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/foo.outjected.com.pem
+    ServerName foo.outjected.com
+    ProxyRequests Off
+    ProxyPreserveHost On
+    ProxyPassReverseCookiePath / /
+    ProxyPass /errors/ !
+    ProxyPass / ajp://localhost:8009/
+    ProxyPassReverse / ajp://localhost:8009/
+    ErrorDocument 503 /errors/503.html
+    DocumentRoot /var/www/foo.outjected.com
+    ErrorLog /var/log/apache2/foo.outjected.com_errors.log
+</VirtualHost>
+----
+
+Now enable the site.
+
++a2ensite foo.outjected.com+
+
+If you restart apache you should now see your 503 page as our JBoss server isn't setup yet.
+
+*Setting up the JBoss Server*
+
+My JBoss AS7 install is at +/usr/local/jboss+ so adjust your paths as necessary.
+
+Edit +/usr/local/jboss/standalone/configuration/standalone.xml+ and make these two modifications under the web subsystem
+
+# Add the ajp connector
+# Add a virtual-server entry for foo.outjected.com
+
+Should look something like this.
+
+[source,xml]
+----
+<subsystem xmlns="urn:jboss:domain:web:1.2" default-virtual-server="default-host" native="false">
+    <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
+    <connector name="ajp" protocol="AJP/1.3" scheme="http" socket-binding="ajp" enabled="true"/>
+    <virtual-server name="default-host" enable-welcome-root="true">
+        <alias name="localhost"/>
+        <alias name="example.com"/>
+    </virtual-server>
+    <virtual-server name="foo" enable-welcome-root="false" default-web-module="foo">
+        <alias name="foo.example.com"/>
+    </virtual-server>
+</subsystem>
+----
+
+Your EAR/WAR is going to need a jboss-web.xml (+foo.war/WEB-INF/jboss-web.xml+) which will define the virtual host
+and set the context root
+
+[source,xml]
+----
+<?xml version="1.0"?>
+<!DOCTYPE jboss-web PUBLIC "-//JBoss//DTD Web Application 5.0//EN" "http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd">
+<jboss-web>
+    <context-root>/</context-root>
+    <virtual-host>foo</virtual-host>
+</jboss-web>
+----
+
+Start up your JBoss server as normal and enjoy your new proxied setup.

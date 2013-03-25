@@ -5,22 +5,30 @@ author: Cody Lerum
 email: cody.lerum@gmail.com
 tags: [ java ]
 ---
-p. Occasionally when working with JSF I have the need to display the values of a Java Enum in a pick-list.
+Occasionally when working with JSF I have the need to display the values of a Java Enum in a pick-list.
 
-bc.. public enum Cars {
+[source,java]
+----
+public enum Cars {
   KIA,
   BMW,
   TOYOTA,
   FERRARI
 }
+----
 
-p. Returning an array of these values is easy enough. Cars.values();
+Returning an array of these values is easy enough. Cars.values();
 
-p. The ordering of the values in the array is set by the ordinal value of the enum, or more simply the order which it appears in the source code. {"KIA", "BMW", "TOYOTA", FERRARI"}
+The ordering of the values in the array is set by the ordinal value of the enum, or more simply the order which it
+appears in the source code. +{"KIA", "BMW", "TOYOTA", FERRARI"}+
 
-p. Now depending on your application, if you need to change the order you can simply change the order they appear in the source code. However if you are like me and persisting these values to a database based on their ordinal value to save space then changing the order will break your application.
+Now depending on your application, if you need to change the order you can simply change the order they appear in
+the source code. However if you are like me and persisting these values to a database based on their ordinal value to
+save space then changing the order will break your application.
 
-bc.. @NotNull
+[source,java]
+----
+@NotNull
 @Column(columnDefinition = "tinyint")
 @Enumerated(EnumType.ORDINAL)
 public Cars getCar() {
@@ -30,27 +38,36 @@ public Cars getCar() {
 public void setEgressCodec(Cars car) {
   this.car = car;
 }
+----
 
-p. The first thing you might want to do is implement Comparable on the Enum and override the compareTo with your own to control the ordering. Unfortunately "compareTo() is final":http://java.sun.com/javase/6/docs/api/java/lang/Enum.html#compareTo(E) on the Enum so we can't override it.
+The first thing you might want to do is implement Comparable on the Enum and override the compareTo with your own
+to control the ordering. Unfortunately
+http://docs.oracle.com/javase/6/docs/api/java/lang/Enum.html[compareTo() is final] on the Enum so we can't
+override it.
 
-p. Here is the solution that I've come up with.
+*Here is the solution that I've come up with.*
 
-p. First I create a new interface called ComparableEnum
+First I create a new interface called ComparableEnum
 
-h5. ComparableEnum.java
+*ComparableEnum.java*
 
-bc.. public interface ComparableEnum {
+[source,java]
+----
+public interface ComparableEnum {
   public String getDisplayName();
   public int getPriority();
   public boolean isDisplayed();
   public int ordinal();
 }
+----
 
-p. Then I can implement this on my Cars Enum using the cost a car as a value for the priority
+Then I can implement this on my Cars Enum using the cost a car as a value for the priority
 
-h5. Cars.java
+*Cars.java*
 
-bc.. public enum Cars implements ComparableEnum {
+[source,java]
+----
+public enum Cars implements ComparableEnum {
 
   KIA("Kia Motors", 15000, true),
   BMW("Bavarian Motor Works", 55000, true),
@@ -76,12 +93,15 @@ bc.. public enum Cars implements ComparableEnum {
      return displayed;
   }
 }
+----
 
-p. Now it's just a matter adding a couple comparators
+Now it's just a matter adding a couple comparators
 
-h5. EnumNameComparator.java
+*EnumNameComparator.java*
 
-bc.. public class EnumNameComparator<T extends ComparableEnum> implements Comparator<T> {
+[source,java]
+----
+public class EnumNameComparator<T extends ComparableEnum> implements Comparator<T> {
   public int compare(T o1, T o2)
   {
      if (o1.getDisplayName().compareTo(o2.getDisplayName()) != 0){
@@ -95,10 +115,13 @@ bc.. public class EnumNameComparator<T extends ComparableEnum> implements Compar
      }
   }
 }
+----
 
-h5. EnumPriorityComparator.java
+*EnumPriorityComparator.java*
 
-bc.. public class EnumPriorityComparator<T extends ComparableEnum> implements Comparator<T> {
+[source,java]
+----
+public class EnumPriorityComparator<T extends ComparableEnum> implements Comparator<T> {
   public int compare(T o1, T o2)
   {
      if (new Integer(o1.getPriority()).compareTo(new Integer(o2.getPriority())) != 0)
@@ -115,19 +138,25 @@ bc.. public class EnumPriorityComparator<T extends ComparableEnum> implements Co
      }
   }
 }
+----
 
-p. Now I want to be able to sort these easily using any enum I have which implements Comparable enum so I add a generic method.
+Now I want to be able to sort these easily using any enum I have which implements Comparable enum so I add a generic method.
 
-bc.. private static <T extends ComparableEnum> List<T> getEnumSortedByPriority(T[] t) {
+[source,java]
+----
+private static <T extends ComparableEnum> List<T> getEnumSortedByPriority(T[] t) {
   EnumPriorityComparator<T> c = new EnumPriorityComparator<T>();
   List<T> list = removeNonDispalyedValues(t);
   Collections.sort(list, c);
   return list;
 }
+----
 
-p. Now I can create a simple method to return my enum sorted how I wish
+Now I can create a simple method to return my enum sorted how I wish
 
-bc.. public static List<Cars> componentTypes() {
+[source,java]
+----
+public static List<Cars> componentTypes() {
   return getEnumSortedByPriority(ComponentType.values());
 }
-
+----

@@ -1,0 +1,88 @@
+---
+title: Hibernate Optimistic Locking and MySQL
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ hibernate, java, mysql ]
+---
+So I ran into a fun little issue the other day while working with MySQL and Hibernate.
+
+Hibernate provides optimistic locking via the http://docs.jboss.org/hibernate/stable/annotations/reference/en/html_single/#entity-mapping-entity-version[Version]
+function. This can either be a numeric field or a timestamp. I use Hibernate Annotations, so for me it simply involves
+placing the following annotation inside my entity.
+
+[source,java]
+----
+private Date dateModified;
+
+@Version
+private Date getDateModified() {
+  return dateModified;
+}
+private void setDateModified(Date dateModified) {
+  this.dateModified = dateModified;
+}
+----
+
+This worked great for me, and provided both an optimistic lock as well as a dateModified field I could use to show
+the last time the entity was updated. I should say that this worked great during development while I was using
+hypersonic as my database. When I deployed to a lab server for testing against our MySQL database I started to run
+into some http://java.sun.com/javaee/5/docs/api/javax/persistence/OptimisticLockException.html[OptimisticLockExceptions]
+
+After doing some digging around I found out that http://bugs.mysql.com/bug.php?id=8523[MySQL doesn't store date/time with millisecond precision].
+This is a well known feature request / bug and it doesn't appear that it will be fixed anytime soon. So I was forced to
+http://en.wikipedia.org/wiki/Code_refactoring[refactor my code] so that the "version" was a int and still maintain a
+dateModified field since the user interface had made use of it in various places.
+
+Thankfully Hibernate provides http://docs.jboss.org/hibernate/stable/entitymanager/reference/en/html_single/#listeners[Call Back]
+annotations which allow me to trigger an update of the dateModified when a Persist or Update is called. I also used
+this logic to automatically set the dateCreated field on entities when needed.
+
+I also added an +@Deprecated+ to the setters for dateCreated and dateModified to discourage others from setting those
+fields manually.
+
+Here is what the final code looks like.
+
+[source,java]
+----
+private int version;
+private Date dateCreated;
+private Date dateModified;
+
+@NotNull
+public Date getDateCreated() {
+  return dateCreated;
+}
+
+@Deprecated
+public void setDateCreated(Date dateCreated) {
+  this.dateCreated = dateCreated;
+}
+
+@PrePersist
+public void updateDateCreated() {
+  dateCreated = new Date();
+  dateModified = dateCreated;
+}
+
+@NotNull
+public Date getDateModified() {
+  return dateModified;
+}
+
+@Deprecated
+public void setDateModified(Date dateModified) {
+  this.dateModified = dateModified;
+}
+
+@PreUpdate
+public void updateDateModified() {
+  dateModified = new Date();
+}
+----
+
+*Update!*
+
+It looks like mysql has this on their roadmap and outlines their plans with a fairly extensive
+http://forge.mysql.com/worklog/task.php?id=946[worklog]. However this is slated for MySQL 6.0 or 7.0 and thus will be
+ a few years out. Maybe it's time to checkout what PostgreSQL is all about.

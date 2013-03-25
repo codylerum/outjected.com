@@ -1,3 +1,9 @@
+encoding: UTF-8
+
+asciidoctor:
+  :attributes:
+    imagesdir: '/'
+
 profiles:
   development:
     robots: ['/']
