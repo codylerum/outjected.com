@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'awestruct', :github=> "awestruct/awestruct", :branch=> "master"
+gem 'awestruct', :github=> "awestruct/awestruct", :branch=> "0.5.0"
 gem 'asciidoctor', '>= 0.1.1'
 gem 'haml'
 gem 'therubyrhino', :platforms => :jruby
