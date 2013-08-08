@@ -5,7 +5,7 @@ author: Cody Lerum
 email: cody.lerum@gmail.com
 tags: [ jboss, apache, ssl, linux, ubuntu ]
 ---
-*Why would you want to do this?*
+==== Why would you want to do this?
 
 After years of having my users connect natively to JBoss application servers in production I have had a few little
 issues that nagged at me. One of the biggest is that there is not a way to show a custom error page to my users when
@@ -14,13 +14,13 @@ the server configuration so that upgrading between minor releases does not requi
 Setting up SSL certificates and modifying the default server ports qualifies as hacking up the standard configuration
 in my book so that is something I would like to limit/avoid.
 
-*The Goal*
+==== The Goal
 
 What we are ultimately trying to do is have an Apache web server handle all the communication between the user and our
 system. This communication will be secured via SSL. The apache server however has no real content so it will "proxy"
 the requests to our JBoss application server. The application server will be as simple as possible and will not run SSL.
 
-*Other details*
+==== Other details
 
 * Our project is named foo
 * Requests come to +https://foo.outjected.com+ and we don't want to have our users go to +https://foo.outjected.com/foo/+
@@ -33,14 +33,14 @@ image::/blog/2012/12/13/apache_to_jboss_as.svg[]
 
 This little example is going to be using Ubuntu 12.04.1 LTS and JBoss AS 7.1.3.Final but should be compatible with similar setups.
 
-*Let's do it.*
+==== Let's do it.
 
 I'm going to assume you have a bare bones Apache 2+ server and JBoss AS7 server setup. If you don't then search around
 for some guides. This blog is interested in how to pair them, not the basic setup of each. You should also have a
 working application and some basic knowledge of how to deploy on AS7. This isn't meant to be a soup to nuts guide
 for building and deploying your application.
 
-*Apache Prep*
+==== Apache Prep
 
 First create a new directory for our non-proxy (error pages) content +/var/www/foo.outjected.com+
 
@@ -85,14 +85,14 @@ Now enable the site.
 
 If you restart apache you should now see your 503 page as our JBoss server isn't setup yet.
 
-*Setting up the JBoss Server*
+==== Setting up the JBoss Server
 
 My JBoss AS7 install is at +/usr/local/jboss+ so adjust your paths as necessary.
 
 Edit +/usr/local/jboss/standalone/configuration/standalone.xml+ and make these two modifications under the web subsystem
 
-# Add the ajp connector
-# Add a virtual-server entry for foo.outjected.com
+- Add the ajp connector
+- Add a virtual-server entry for foo.outjected.com
 
 Should look something like this.
 

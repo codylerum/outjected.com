@@ -5,7 +5,7 @@ author: Cody Lerum
 email: cody.lerum@gmail.com
 tags: [ cdi, jsf, java ]
 ---
-*Where I started banging my head into the table.*
+==== Where I started banging my head into the table.
 
 This specific issue has actually has jumped up and bit me a few times so I'll just try explain the most recent one.
 Basically I have a new object that I am creating through a JSF form page, and that object needs to have a default
@@ -13,7 +13,7 @@ value set at creation which is determined at runtime.  For the sake of exposing 
 this value needs to be used multiple times during the request and thus we will make the producer +@RequestScoped+
 to avoid duplicate database calls.
 
-*To the code!*
+==== To the code!
 
 [source,java]
 ----
@@ -68,21 +68,21 @@ Now lets show the JSF snippet to select our price book when creating our new Car
 </h:selectOneMenu>
 ----
 
-*Where it goes wrong.*
+==== Where it goes wrong.
 
 What we would expect to happen is the selectOneMenu would initially be selected with the value of our active price book.
 However this isn't going to be the case because the injection of our active price book does not give us an object of
 PriceBook.java it gives us an _proxy_ of PriceBook.java and the +equals(...)+ that JSF is going to call
 will not return true.
 
-*Why it goes wrong.*
+=== Why it goes wrong.
 
 The CDI EG has determined that there is not meaningful way to implement +.equals()+ and +.hashCode()+ on a proxy that
 can delegate to the underlying bean (See https://issues.apache.org/jira/browse/OWB-458[OWB-458] &
 https://issues.jboss.org/browse/WELD-695[WELD-695]). What this means is that two proxies of the same underlying bean
 will be equal. However, two proxies to underlying beans which are equal according to +.equals+ will not be equal.
 
-(How can we fix this?*
+=== How can we fix this?
 
 One solution would be to execute the +.equals()+ on the converted value if a converter exists. However, the JSF RI
 http://javaserverfaces.java.net[Mojarra] feels (http://java.net/jira/browse/JAVASERVERFACES-2393[JAVASERVERFACES-2393])
@@ -92,7 +92,7 @@ underlying bean can change during the lifecycle of the proxy and thus delegating
 one of those places where the JSF and CDI expert groups need to step in and find a solution so that developers can
 enjoy consistent and predictable behavior in their applications.
 
-*A solutions that work now.*
+=== A solutions that work now.
 
 By making the bean with the producers +@RequestScoped+ and storing the values in the bean after initial population we
 can have default dependent scoped producers which don't produce proxies and hit the database only once.

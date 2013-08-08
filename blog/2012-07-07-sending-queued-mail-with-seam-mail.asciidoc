@@ -5,19 +5,19 @@ author: Cody Lerum
 email: cody.lerum@gmail.com
 tags: [ java, seam, email ]
 ---
-*The Problem*
+==== The Problem
 
 One of the more common questions that I see by users coming to "Seam 3 Mail":http://www.seamframework.org/Seam3/MailModule is about sending email asynchronously like was possible in "Seam 2":http://docs.jboss.org/seam/2.2.2.Final/reference/en-US/html_single/#d0e21609. This usually stems from "slowness" problems that arise when sending mail through an interactive application. The problem is that when your "user" submits that order for his fancy new widgets, the confirmation email sent is using the same thread that handled the processing of the web page. Thus the user is left with their browser in a blocked "loading" state thinking your application is slow when in reality it's the mail server that is taking its sweet time.
 
-*The Knee-jerk Reaction*
+==== The Knee-jerk Reaction
 
 A lot of people will see this blocked thread and think the solution is to fire the email asynchronously. This way the email with be dispatched via separate thread and control will be instantly returned to the user . However the problem with asynchronous methods is that they are fire and forget. If an exception occurs during the send process, then the email is lost and there is no notification that it failed. Realistically, outside of a demo application you generally want some guarantee that the email was, or will be sent as having all those order confirmation emails silently lost will not be pretty.
 
-*You Really Want*
+==== You Really Want
 
 What is needed is a system which allows you to send email from your application without blocking the execution on the current thread, while at the same time providing a guarantee that the email will be reliably sent (at least from your application to your "SMTP":http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol server).
 
-*The Solution*
+==== The Solution
 
 Seam Mail provides a way to replace out the default "send" implementation with one of your own via the "MailTransporter":https://github.com/seam/mail/blob/develop/api/src/main/java/org/jboss/seam/mail/core/MailTransporter.java interface. That way when you call @msg.send()@ you can control how and when the email is "sent". What follows is a basic implementation.
 

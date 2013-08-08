@@ -5,13 +5,13 @@ author: Cody Lerum
 email: cody.lerum@gmail.com
 tags: [ java, seam, email ]
 ---
-*Obligatory Links and Compatibility*
+==== Obligatory Links and Compatibility
 
 I'm happy to announce that I've released a minor update to http://www.seamframework.org/Seam3/Mail[Seam 3 Mail]
 versioned https://repository.jboss.org/nexus/index.html#nexus-search;quick~seam-mail[3.1.1.Final]. This is a minor
 release which is compatible with http://in.relation.to/Bloggers/JBossSeam31FinalReleased[Seam 3.1.0.Final].
 
-*Whats new?*
+==== Whats new?
 
 The main goal of this release was to fill in some gaps in documentation as well as some minor bug fixes which popped up
 since the 3.1.0.Final release. I've also added in a utility class called
@@ -21,13 +21,13 @@ option for Seam Mail to receive messages in addition to sending them. Check out
 https://issues.jboss.org/browse/SEAMMAIL/fixforversion/12318997#selectedTab=com.atlassian.jira.plugin.system.project%3Aversion-issues-panel[Closed Issues]
 on the JIRA tracker for details.
 
-*What does future look like?*
+==== What does future look like?
 
 Seam 3 Mail will continue to provide releases in its current format until the time comes for it to transition to
 http://incubator.apache.org/deltaspike/[Apache DeltaSpike]. In the meantime if you have features for fixes to contribute
 just open a http://jira.jboss.org/browse/SEAMMAIL[JIRA] and I'll be happy to work them in.
 
-*How about an example?*
+==== How about an example?
 
 POP3+SSL to receive an MimeMessage and convert it. It's basically for gmail but with values changed to protect the
 innocent.
