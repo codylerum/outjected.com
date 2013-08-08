@@ -1,0 +1,106 @@
+---
+title: "Embrace the JPA 2 Criteria API"
+layout: blog
+author: Cody Lerum
+email: cody.lerum@gmail.com
+tags: [ java, hibernate, jpa ]
+---
+==== A bit of history and a problem statement of sorts
+
+I've been a big fan of criteria queries for writing dynamic http://en.wikipedia.org/wiki/Java_Persistence_API[JPA]
+queries for a long time. Sure I could make the same thing happen with a bit of logic and a whole lot of string
+concatenation but that gets old really quick. My first experience with criteria queries was with Hibernate 3 so lets
+start there and we will follow a query from SQL to JPA 2 Criteria.
+
+We are all probably all most familiar with http://en.wikipedia.org/wiki/Sql[SQL] so lets make that our starting point.
+
+Assuming we have table in the database of tasks lets select those which are assigned to a specific user which have
+not been closed.
+
++select * from Task t where t.assignee=1 and t.dateClosed is null+
+
+However, we are living in an ORM world though so lets see it in
+http://en.wikipedia.org/wiki/Java_Persistence_Query_Language[JPQL]
+(same syntax in http://en.wikipedia.org/wiki/Hibernate_(Java)[HQL])
+
+[source,java]
+----
+List<Task> tasks = entityManager.createQuery("select t from Task t where t.assignee=:user"
++ " and t.dateClosed is null",Task.class).setParameter("user", myUser).getResultList();
+----
+
+Now lets migrate our query to use the Hibernate 3 Criteria API
+
+[source,java]
+----
+Session session = (Session) entityManager.getDelegate();
+Criteria criteria = session.createCriteria(Task.class);
+criteria.add(Restrictions.eq("assignee", myUser));
+criteria.add(Restrictions.isNull("dateClosed"));
+List<Task> tasks = criteria.list();
+----
+
+Obviously this is more verbose but it also has some readability advantages in my opinion. Even if you disagree with
+regard to readability you can see that adding restrictions to the query in a programmatic way is much simpler than with
+JPQL/HQL.
+
+However the one thing always bugged with with JPQL/HQL and Hibernate's Criteria API is that everything is done with strings
+and doing things with strings makes refactoring difficult even with good tooling. This is Java and we want something
+type-safe.
+
+==== JPA 2 Criteria API to the rescue.
+
+[source,java]
+----
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Task> cq = cb.createQuery(Task.class);
+Root<Task> root = cq.from(Task.class);
+List<Predicate> predicates = new ArrayList<>();
+predicates.add(cb.equal(root.get(Task_.assignee), myUser));
+predicates.add(cb.isNull(root.get(Task_.dateClosed));
+cq.where(predicates.toArray(new Predicate[predicates.size()]));
+List<Task> tasks = em.createQuery(cq).getResultList();
+----
+
+I will readily admit that upon first taking a look at the JPA 2.0 Criteria API I was really turned off by its verbosity and
+complexity. I was turned off so much that I flat out ignored it for the first six months it was available to me. I
+still however desired a type-safe way to write my queries so that they would hold up better during refactoring.
+
+Finally I blocked out a day to tinker with the API and see if I could convert a few of my more simple queries. After only a few
+minutes I was off and running and haven't looked back. Here are a couple things I've learned during my time tinkering.
+
+- The code is longer but I can read and understand it much faster than a JPQL/HQL query.
+
+- I can write a criteria query faster due to IDE code completion and not having to review my entity structure to find the name
+of that specific column I'm trying to reference.
+
+- As the complexity of the query goes up the benefits of the criteria query grow, but you will be forced to do some learning.
+I have yet to find a query that I have not been able to convert. The API was very well thought out from this perspective.
+
+- My speed of development is faster almost 100% of the time as my criteria queries execute and return the desired results on the
+first try. I can't say the same for my JPQl/HQL which are parsing a potentially very long string with lots of
+opportunities for syntax issues.
+
+==== It isn't however all sunshine and lollipops
+
+This isn't to say the API is perfect. It actually fights programmatic creation of quarries a little bit. The API is designed
+so that the base of your query can reused. For example each time you call the +criteriaQuery.where(Predicate... predicates)+
+it replaces what was previously set. To work around this you need to store your predicates in a separate list and then
+add then all at once in array form (varargs). It would be nice if a +criteriaQuery.where(List<Predicate> predicates)+ was
+exposed like it is for groupBy and orderBy. Additionally here are some other pain points.
+
+- Why is a http://docs.oracle.com/javaee/6/api/javax/persistence/criteria/Fetch.html[Fetch<Z,X>] not a
+http://docs.oracle.com/javaee/6/api/javax/persistence/criteria/Path.html[Path] like
+http://docs.oracle.com/javaee/6/api/javax/persistence/criteria/Join.html[Join<Z,X>] is? This means I need to define my "join"
+twice it I want it "join fetched". Hopefully this is fixed in http://jcp.org/en/jsr/detail?id=338[JPA 2.1]
+
+- https://bugs.eclipse.org/bugs/show_bug.cgi?id=387956[Metamodel generation is broken in Eclipse]. It doesn't handle the
+cyclic nature of the metamodel classes. Thus when I do a project clean I will end up with 20 or so import failed errors.
+These are easily resolved by making a meaningless edit to the class to trigger an incremental build but it shouldn't be this way.
+
+==== Just do it
+Hopefully I've inspired you to take another look if you've previous dismissed the API as I had. Block out a few hours
+and give it a shot. I'll try to share my utility classes that I've written in an upcoming post that have made things a
+it easier for me, but in the meantime you really should get down and dirty with the api to understand it fully.
+
+You'll be glad you did.
