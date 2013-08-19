@@ -83,10 +83,10 @@ opportunities for syntax issues.
 
 ==== It isn't however all sunshine and lollipops
 
-This isn't to say the API is perfect. It actually fights programmatic creation of quarries a little bit. The API is designed
+This isn't to say the API is perfect. It actually fights programmatic creation of queries a little bit. The API is designed
 so that the base of your query can reused. For example each time you call the +criteriaQuery.where(Predicate... predicates)+
 it replaces what was previously set. To work around this you need to store your predicates in a separate list and then
-add then all at once in array form (varargs). It would be nice if a +criteriaQuery.where(List<Predicate> predicates)+ was
+add them all at once in array form (varargs). It would be nice if a +criteriaQuery.where(List<Predicate> predicates)+ was
 exposed like it is for groupBy and orderBy. Additionally here are some other pain points.
 
 - Why is a http://docs.oracle.com/javaee/6/api/javax/persistence/criteria/Fetch.html[Fetch<Z,X>] not a
