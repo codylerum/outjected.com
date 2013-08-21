@@ -22,9 +22,8 @@
 }
 
 .blog-content {
-    margin: 5px;
-    padding:10px;
-    margin-left:15px;
+    padding:5px;
+    margin-left:5px;
 }
 
 .blog-page {
@@ -33,7 +32,7 @@
 }
 
 .blog-archive > ul {
-  margin-left:0px !important;
+  margin-left:0px;
 }
 
 .blog-archive ul {
@@ -70,8 +69,9 @@
   white-space:nowrap;
 }
 
-.panel > .label {
+.side-panel > .label {
+  display:block;
    width:100%;
    padding-right:0px;
    padding-left:0px;
- }
+}

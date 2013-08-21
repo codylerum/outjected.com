@@ -2,31 +2,28 @@
 layout: base
 description: Outjected is an infrequent blog about the frequent issues and annoyances that pop up while coding.
 ---
-.row-fluid
-  .span12
-    - for blog in page.blogs
-      - if blog != nil
-        .row-fluid
-          .span12.floating-page.blog-page
-            %h3
-              %a{:href=>blog.url}= blog.title
-            .blog-content
-              = blog.content
-              .clearfix
-                .pull-left
-                  - if blog.tags
-                    .tags
-                      %span.title
-                        tags:
-                      -for tag in blog.tags
-                        %a.label.label-info.text-center{:href => "/blog/tags/#{tag}"} #{tag}
-                .pull-right
-                  %h6 #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
-              .clearfix
-                .pull-left
-                  = blog.disqus_comments_link
-.row-fluid.text-center
-  .span12
+- for blog in page.blogs
+  - if blog != nil
+    .col-md-12.floating-page.blog-page
+      %h3
+        %a{:href=>blog.url}= blog.title
+      .blog-content
+        = blog.content
+        .clearfix
+          .pull-left
+            - if blog.tags
+              .tags
+                %span.title
+                  tags:
+                -for tag in blog.tags
+                  %a.label.label-primary.text-center{:href => "/blog/tags/#{tag}"} #{tag}
+          .pull-right
+            %strong #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
+        .clearfix
+          .pull-left
+            = blog.disqus_comments_link
+.row.text-center
+  .col-md-12
     - for p in page.blogs.pages
       - if p == page.blogs.current_page
         %span.badge #{page.blogs.current_page_index + 1}
