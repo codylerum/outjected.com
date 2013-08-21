@@ -17,6 +17,5 @@ layout: base
               %a.label.label-primary.text-center{:href => "/blog/tags/#{tag}"} #{tag}
       .pull-right
         %strong #{page.author} - #{page.date.strftime( '%B %d, %Y' )}
-    .clearfix
-      .comments
-        = page.disqus_comments
+    .clearfix.comments
+      = page.disqus_comments

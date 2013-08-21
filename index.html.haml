@@ -19,7 +19,7 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
                   %a.label.label-primary.text-center{:href => "/blog/tags/#{tag}"} #{tag}
           .pull-right
             %strong #{blog.author} - #{blog.date.strftime( '%B %d, %Y' )}
-        .clearfix
+        .clearfix{:style=>"margin-top:5px"}
           .pull-left
             = blog.disqus_comments_link
 .row.text-center
