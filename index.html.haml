@@ -23,10 +23,14 @@ description: Outjected is an infrequent blog about the frequent issues and annoy
           .pull-left
             = blog.disqus_comments_link
 .row.text-center
-  .col-md-12
-    - for p in page.blogs.pages
-      - if p == page.blogs.current_page
-        %span.badge #{page.blogs.current_page_index + 1}
-      -else
-        %a.badge.badge-info{:href=>p.output_path} #{page.blogs.pages.index(p) + 1}
+  - if page.blogs.pages.length != 1
+    .col-md-12
+      %ul.pagination
+        - for p in page.blogs.pages
+          - if p == page.blogs.current_page
+            %li.active
+              %a{:href=>"#"} #{page.blogs.current_page_index + 1}
+          -else
+            %li
+              %a{:href=>p.output_path} #{page.blogs.pages.index(p) + 1}
 = page.blogs[0].disqus_comments_count
