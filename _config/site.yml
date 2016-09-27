@@ -10,11 +10,11 @@ profiles:
     base_url: http://stewie:4242
   production:
     disqus: outjected
-    google_analytics: UA-32753867-2
+    g_analytics: true
     robots: ['google5576bee535bb3234.html']
     change_frequency: weekly
-    base_url: http://www.outjected.com
+    base_url: https://www.outjected.com
     deploy:
-      host: awestruct@tin.clearfly.net
+      host: awestruct@oxygen.clearfly.net
       path: /var/www/outjected.com
       uncommitted: true
